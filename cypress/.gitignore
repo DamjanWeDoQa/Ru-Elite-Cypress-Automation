@@ -1,7 +1,0 @@
-cypress/videos
-cypress/screenshots
-.cypress/
-node_modules
-downloads
-Cypress/
-cypress.json
