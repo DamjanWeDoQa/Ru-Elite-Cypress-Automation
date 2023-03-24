@@ -60,7 +60,7 @@ Cypress.Commands.add('login', (username, password) => {
     cy.get(firstNameInput).should('be.visible').type('John');
     cy.get(middleNameInput).should('be.visible').type('M');
     cy.get(lastNameInput).should('be.visible').type('LastName');
-    cy.get(ageInput).should('be.visible').type('20');
+    cy.get(ageInput).should('be.visible').type('60');
     cy.get(descriptionInput).should('have.value', 'Current Plan');
     cy.get(submitButton).click();
     
