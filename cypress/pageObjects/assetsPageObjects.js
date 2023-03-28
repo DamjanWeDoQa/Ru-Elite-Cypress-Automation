@@ -23,7 +23,42 @@ export class assetsPage {
       ".container-fluid div:nth-of-type(3) [class='Button__DefaultButton-sc-ftu7s5-0 Nbwot btn btn-primary']";
     this.manageHoldingsDoneButton =
       ".modal-footer > .Button__DefaultButton-sc-ftu7s5-0.Nbwot.btn.btn-primary";
+      this.createAccountLink = ".container-footer";
+      this.firstNameInput = '#firstName';
+      this.lastNameInput = '#lastName';
+      this.companyInput = '#company';
+      this.phoneInput = '#phone';
+      this.emailInput = '#email';
+      this.passwordInput = '#password';
+      this.promoInput = '#promo';
+      this.createAccountButton = 'button.Button__DefaultButton-sc-ftu7s5-0.LaddaButton__StyledButton-sc-1p7juw2-0.Nbwot.jiuvEj.btn.btn-primary.ladda-button';
+      this.continueButton = 'button[data-style="expand-left"][type="submit"]'
   }
+
+  randomString() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    for (var i = 0; i < 10; i++)
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+  }
+
+  createAccount (firstName, lastName, companyName, phoneNumber, password, promo) {
+    cy.get(this.createAccountLink).find('a').click()
+    cy.get(this.firstNameInput).type('John')
+    cy.get(this.lastNameInput).type('Johnson')
+    cy.get(this.companyInput).type('test Company')
+    cy.get(this.phoneInput).type('5345655656')
+    cy.get(this.emailInput).type('qtester97+jete2802@gmail.com')
+    cy.get(this.passwordInput).type('validpassword')
+    cy.get(this.promoInput).type('covered')
+    cy.get(this.createAccountButton).click()
+    cy.get(this.continueButton).click()
+}
+
+coveredValidation (){
+    cy.get('.covered-label').should('be.visible').and('have.text', 'We got you covered!')
+}
 
   navigateToAssetsPage() {
     cy.get(this.sourcesNavLink).should("be.visible").click();
