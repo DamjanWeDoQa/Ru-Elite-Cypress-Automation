@@ -43,25 +43,25 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 })
 
 Cypress.Commands.add('login', (username, password) => {
-    cy.visit('/');
-    cy.intercept('GET', 'https://elite-qa.retireup.com/').as('loginRequest');
-    cy.get(emailInput).type(username);
-    cy.get(passwordInput).type(password);
-    cy.get(submitButton).should('be.visible').click();
-    cy.wait('@loginRequest').then((interception) => { 
-      expect(interception.response.statusCode).to.eq(302); 
-    });
+  cy.visit('/');
+  cy.intercept('GET', 'https://elite-qa.retireup.com/').as('loginRequest');
+  cy.get(emailInput).type(username);
+  cy.get(passwordInput).type(password);
+  cy.get(submitButton).should('be.visible').click();
+  cy.wait('@loginRequest').then((interception) => {
+    expect(interception.response.statusCode).to.eq(302);
   });
-  
-  Cypress.Commands.add('createNewClient',() => {
-    cy.get(addClientButton).click();
-    cy.get(createPlanModal).should('be.visible');
-    cy.get(retireUpOption).should('be.visible').click();
-    cy.get(firstNameInput).should('be.visible').type('John');
-    cy.get(middleNameInput).should('be.visible').type('M');
-    cy.get(lastNameInput).should('be.visible').type('LastName');
-    cy.get(ageInput).should('be.visible').type('60');
-    cy.get(descriptionInput).should('have.value', 'Current Plan');
-    cy.get(submitButton).click();
-    
-  });
+});
+
+Cypress.Commands.add('createNewClient', () => {
+  cy.get(addClientButton).click();
+  cy.get(createPlanModal).should('be.visible');
+  cy.get(retireUpOption).should('be.visible').click();
+  cy.get(firstNameInput).should('be.visible').type('John');
+  cy.get(middleNameInput).should('be.visible').type('M');
+  cy.get(lastNameInput).should('be.visible').type('LastName');
+  cy.get(ageInput).should('be.visible').type('60');
+  cy.get(descriptionInput).should('have.value', 'Current Plan');
+  cy.get(submitButton).click();
+
+});

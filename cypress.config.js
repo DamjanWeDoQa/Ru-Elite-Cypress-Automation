@@ -4,7 +4,7 @@ module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       // implement node event listeners here
-      
+
     },
     baseUrl: 'https://elite-qa.retireup.com/login',
     env: {
@@ -14,6 +14,5 @@ module.exports = defineConfig({
     },
     chromeWebSecurity: false,
     chromeWebSecurityDisableFetch: true,
-    
   },
 });
