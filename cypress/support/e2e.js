@@ -18,3 +18,6 @@ import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+const xlsx = require('node-xlsx').default
+const fs = require('fs');
+const path = require('path');

@@ -24,6 +24,7 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 import './commands';
+const xlsx = require('xlsx');
 
 const emailInput = 'input#email';
 const passwordInput = 'input#password';
@@ -36,6 +37,8 @@ const lastNameInput = '#lastName';
 const ageInput = '#age';
 const descriptionInput = '#description';
 const createPlanModal = '.modal-content';
+
+
 
 Cypress.on('uncaught:exception', (err, runnable) => {
   // returning false here prevents Cypress from failing the test
@@ -60,8 +63,68 @@ Cypress.Commands.add('createNewClient', () => {
   cy.get(firstNameInput).should('be.visible').type('John');
   cy.get(middleNameInput).should('be.visible').type('M');
   cy.get(lastNameInput).should('be.visible').type('LastName');
-  cy.get(ageInput).should('be.visible').type('60');
+  cy.get(ageInput).should('be.visible').type('63');
   cy.get(descriptionInput).should('have.value', 'Current Plan');
   cy.get(submitButton).click();
-
 });
+
+
+Cypress.Commands.add('parseExcel', (filePath, sheetName, rowIndex, columnIndex, expectedValue) => {
+  cy.task('parseXlsx', { filePath }).then((jsonData) => {
+    const sheetData = jsonData.find((sheet) => sheet.name === sheetName);
+    const actualValue = sheetData.data[rowIndex][columnIndex];
+    cy.log(`Actual value: ${actualValue}`);
+    expect(actualValue).to.equal(expectedValue);
+  });
+});
+
+Cypress.Commands.add('findInExcel', (filePath, sheetName, searchValue, columnIndex) => {
+  if (!searchValue) {
+    throw new Error('Search value is null or undefined');
+  }
+  if (columnIndex === undefined || columnIndex < 0) {
+    columnIndex = 0;
+  }
+
+  cy.task('parseXlsx', { filePath }).then((jsonData) => {
+    const sheetData = jsonData.find((sheet) => sheet.name === sheetName);
+    const matchingCells = sheetData.data
+      .map((row, rowIndex) => row.map((cellValue, colIndex) => ({ cellValue, rowIndex, colIndex })))
+      .flat()
+      .filter(({ cellValue, colIndex }) => {
+        const valueAsPercentage = (cellValue * 100).toFixed(2) + '%';
+        return colIndex === columnIndex && cellValue !== null && cellValue !== undefined && valueAsPercentage === searchValue;
+      });
+    const matchingCellPositions = matchingCells.map(({ rowIndex, colIndex }) => `[${rowIndex}][${colIndex}]`);
+    if (matchingCellPositions.length === 0) {
+      throw new Error(`Value "${searchValue}" not found in sheet "${sheetName}"`);
+    }
+    cy.log(`Found ${matchingCellPositions.length} cell(s) with value "${searchValue}" in column ${String.fromCharCode(65 + columnIndex)}: ${matchingCellPositions.join(', ')}`);
+  });
+});
+
+
+Cypress.Commands.add("getNthBarChartValue", (n, chartSelector) => {
+  cy.get(chartSelector)
+    .find(`.return-bars > path:nth-of-type(${n})`)
+    .trigger("mouseover")
+    .wait(500)
+    .get(".tooltip-inner")
+    .should("be.visible")
+    .invoke("text")
+    .then((text) => {
+      const percentage = text.match(/[\d.]+%/);
+      if (percentage) {
+        cy.log(`The value of the ${n}th bar chart element is: ${percentage[0]}`);
+      } else {
+        cy.log(`Failed to get the value of the ${n}th bar chart element.`);
+      }
+    })
+});
+
+
+
+
+
+
+

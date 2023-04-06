@@ -1,10 +1,28 @@
 const { defineConfig } = require("cypress");
+const fs = require('fs');
+const path = require('path');
+const xlsx = require('node-xlsx').default;
+
+const readExcelFile = (filePath) => {
+  const fileData = fs.readFileSync(filePath);
+  return Buffer.from(fileData);
+};
 
 module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
-      // implement node event listeners here
-
+      on("task", {
+        parseXlsx: ({ filePath }) => {
+          return new Promise((resolve, reject) => {
+            try {
+              const jsonData = xlsx.parse(fs.readFileSync(filePath));
+              resolve(jsonData);
+            } catch (e) {
+              reject(e);
+            }
+          });
+        },
+      });
     },
     baseUrl: 'https://elite-qa.retireup.com/login',
     env: {
@@ -14,5 +32,6 @@ module.exports = defineConfig({
     },
     chromeWebSecurity: false,
     chromeWebSecurityDisableFetch: true,
+    fixturesFolder: 'cypress/fixtures',
   },
 });
