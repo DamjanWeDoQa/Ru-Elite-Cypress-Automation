@@ -25,6 +25,8 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 import './commands';
 const xlsx = require('xlsx');
+const fs = require('fs');
+const ExcelJS = require('exceljs');
 
 const emailInput = 'input#email';
 const passwordInput = 'input#password';
@@ -99,10 +101,35 @@ Cypress.Commands.add('findInExcel', (filePath, sheetName, searchValue, columnInd
     if (matchingCellPositions.length === 0) {
       throw new Error(`Value "${searchValue}" not found in sheet "${sheetName}"`);
     }
+
+    const firstMatchingCellPosition = matchingCellPositions[0];
+    const firstRowIndex = parseInt(firstMatchingCellPosition.substring(1, firstMatchingCellPosition.indexOf(']')));
+
     cy.log(`Found ${matchingCellPositions.length} cell(s) with value "${searchValue}" in column ${String.fromCharCode(65 + columnIndex)}: ${matchingCellPositions.join(', ')}`);
+    return cy.wrap(firstRowIndex).as('firstRowIndex');
   });
 });
 
+Cypress.Commands.add('writeToExcel', (filePath, sheetName, rowIndex, columnIndex, value) => {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`File ${filePath} does not exist.`);
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  return workbook.xlsx.readFile(filePath)
+    .then(() => {
+      const sheet = workbook.getWorksheet(sheetName);
+      const cell = sheet.getCell(rowIndex, columnIndex);
+      cell.value = value;
+      return workbook.xlsx.writeFile(filePath);
+    })
+    .then(() => {
+      cy.log(`Successfully wrote "${value}" to cell [${rowIndex}][${columnIndex}] in sheet "${sheetName}"`);
+    })
+    .catch((err) => {
+      throw new Error(`Error writing to cell [${rowIndex}][${columnIndex}] in sheet "${sheetName}": ${err.message}`);
+    });
+});
 
 Cypress.Commands.add("getNthBarChartValue", (n, chartSelector) => {
   cy.get(chartSelector)

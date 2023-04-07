@@ -4,17 +4,23 @@ const value = 2000000;
 const isQualifed = true;
 const employeeContribution = true;
 const rowIndex = 9;
-const filePath = 'C:\\Users\\tester\\Documents\\Ru - Elite Automation\\cypress\\fixtures\\ruExcel.xlsm'
-
+const filePath = 'C:\\Users\\tester\\Documents\\Ru_Elite_Automation_Cypress\\cypress\\fixtures\\ruExcel.xlsm'
+const filepath1= 'C:\\Users\\tester\\Documents\\Ru_Elite_Automation_Cypress\\cypress\\fixtures\\test.xlsx';
 const returnsChartPlanPage = '.Chart__Styledsvg-sc-hj1xii-0.dJhaml';
 
 describe("Assets Page", () => {
   beforeEach(() => {
-    cy.login(Cypress.env("username"), Cypress.env("password"));
+    //cy.login(Cypress.env("username"), Cypress.env("password"));
   });
 
-  it('The user is able to parse excel file', () => {
-    cy.findInExcel(filePath, 'RetireUp Market Returns', '5.21%', rowIndex);
+  it.only('The user is able to parse excel file', () => {
+    var xyz= cy.findInExcel(filePath, 'RetireUp Market Returns', '5.21%', rowIndex).then(() => {
+      cy.get('@firstRowIndex').then((rowIndex) => {
+        
+        cy.log(`Found matching cell at row ${rowIndex}`);
+      });
+    });
+    cy.writeToExcel(filepath1, 'Notes', 0, 0, 'Hello, world!'); //figure out how to workaround the access
   });
 
   it("RU FLOW", () => {
